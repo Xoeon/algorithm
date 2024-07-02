@@ -1,55 +1,40 @@
 const solution = (friends, gifts) => {
-  // 주고받은 선물 집계
-  const giftCounts = {};
-  // 전체 선물 집계
-  const totalCounts = {};
+  const length = friends.length;
 
-  // 전체 선물, 주고받은 선물(from whom) 객체 생성
-  friends.forEach((friend) => {
-    giftCounts[friend] = {};
-    totalCounts[friend] = { given: 0, received: 0 };
+  const giftPoints = new Array(length).fill(0); // 선물 지수
+  const index = {}; // 친구 이름을 배열 인덱스에 매핑하는 객체
+  const record = []; // 각 친구 간 선물을 주고받은 횟수를 기록하는 2차원 배열
+  const points = new Array(length).fill(0); // 각 친구의 점수
 
-    friends.forEach((otherFriend) => {
-      if (friend !== otherFriend) {
-        giftCounts[friend][otherFriend] = { given: 0, received: 0 };
-      }
-    });
-  });
+  for (let i = 0; i < length; i++) {
+    record[i] = new Array(length).fill(0);
+    index[friends[i]] = i; // 객체에 친구 이름을 인덱스로 매핑
+    // e.g. { a: 1, b: 2, c: 2}
+  }
 
-  // 전체 선물, 주고받은 선물 집계
   gifts.forEach((gift) => {
-    const [giver, receiver] = gift.split(" ");
-    if (giftCounts[giver]) totalCounts[giver].given++;
-    if (giftCounts[giver][receiver]) giftCounts[giver][receiver].given++;
+    const [giver, taker] = gift.split(" ");
 
-    if (giftCounts[receiver]) totalCounts[receiver].received++;
-    if (giftCounts[receiver][giver]) giftCounts[receiver][giver].received++;
+    // 선물 주고받은 횟수 계산
+    record[index[giver]][index[taker]] += 1;
+
+    // 선물 지수 계산
+    giftPoints[index[giver]] += 1;
+    giftPoints[index[taker]] -= 1;
   });
 
-  const result = {};
-
-  friends.forEach((friend) => {
-    result[friend] = 0;
-
-    friends.forEach((otherFriend) => {
-      if (friend !== otherFriend) {
-        const given = giftCounts[friend][otherFriend]?.given || 0;
-        const received = giftCounts[friend][otherFriend]?.received || 0;
-
-        if (given > received) result[friend]++;
-        else if (given === received || (given === 0 && received === 0)) {
-          const friendGiftIndex =
-            totalCounts[friend].given - totalCounts[friend].received;
-          const otherFriendGiftIndex =
-            totalCounts[otherFriend].given - totalCounts[otherFriend].received;
-
-          if (friendGiftIndex > otherFriendGiftIndex) result[friend]++;
-          else if (friendGiftIndex === otherFriendGiftIndex)
-            result[friend] += 0;
+  // 점수 계산
+  for (let i = 0; i < length; i++) {
+    for (let j = 0; j < length; j++) {
+      if (record[i][j] > record[j][i]) {
+        points[i] += 1;
+      } else if (record[i][j] === record[j][i]) {
+        if (giftPoints[i] > giftPoints[j]) {
+          points[i] += 1;
         }
       }
-    });
-  });
+    }
+  }
 
-  return Math.max(...Object.values(result));
+  return Math.max(...points);
 };
