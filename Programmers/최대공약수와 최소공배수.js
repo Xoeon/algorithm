@@ -1,13 +1,8 @@
-const gcf = (a, b) => {
-  if (b === 0) return a;
-  return gcf(b, a % b);
-};
-
-const lcm = (a, b) => {
-  const g = gcf(a, b);
-  return g * (a / g) * (b / g);
-};
-
-const solution = (n, m) => {
-  return [gcf(n, m), lcm(n, m)];
+const solution = (d, budget) => {
+  let count = 0;
+  d.sort((a, b) => a - b).reduce((acc, curr) => {
+    while (acc <= budget) {
+      acc += acc + curr;
+    }
+  }, 0);
 };
