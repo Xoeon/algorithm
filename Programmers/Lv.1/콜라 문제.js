@@ -7,7 +7,6 @@ const solution = (a, b, n) => {
     let taken = (given / b) * a;
 
     bottles = bottles - taken + given;
-    console.log(given, taken, bottles);
     answer += given;
   }
 
