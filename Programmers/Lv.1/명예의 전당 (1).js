@@ -1,17 +1,16 @@
 const solution = (k, score) => {
-  let arr = [],
-    answer = [];
-  const len = score.length;
+  const stack = [];
 
-  for (let i = 0; i < len; i++) {
-    arr.push(score[i]);
-    answer.push(
-      arr
-        .sort((a, b) => b - a)
-        .slice(0, k)
-        .pop()
-    );
-  }
-
-  return answer;
+  return score.reduce((a, c) => {
+    if (stack.length < k) {
+      stack.push(c);
+      stack.sort((a, b) => a - b);
+    } else {
+      stack.push(c);
+      stack.sort((a, b) => a - b);
+      stack.shift();
+    }
+    a.push(stack[0]);
+    return a;
+  }, []);
 };
