@@ -1,16 +1,17 @@
-const solution = (n) => {
-  if (n < 2) return 0;
-
-  let sieve = new Array(n + 1).fill(true);
-  sieve[0] = sieve[1] = false;
-
-  for (let i = 2; i * i <= n; i++) {
-    if (sieve[i]) {
-      for (let j = i * i; j <= n; j += i) {
-        sieve[j] = false;
-      }
+const isPrimeNum = (n) => {
+  if (n <= 1) return false;
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) {
+      return false;
     }
   }
+  return true;
+};
 
-  return sieve.filter(Boolean).length;
+const solution = (n) => {
+  let count = 0;
+  for (let i = 2; i <= n; i++) {
+    if (isPrimeNum(i)) count++;
+  }
+  return count;
 };
