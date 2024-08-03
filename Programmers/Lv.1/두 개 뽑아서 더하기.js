@@ -1,12 +1,22 @@
-const solution = (numbers) => {
-  const l = numbers.length;
-  let answer = [];
+const solution = (s, skip, index) => {
+  let skipIdx = [...skip].map((char) => char.charCodeAt(0));
 
-  for (let i = 0; i < l; i++) {
-    for (let j = i + 1; j < l; j++) {
-      answer.push(numbers[i] + numbers[j]);
+  let sIdx = [...s].map((char) => {
+    let charIdx = char.charCodeAt(0);
+    let count = 0;
+
+    while (count !== index) {
+      if (charIdx + 1 > 122) {
+        charIdx -= 25;
+      } else {
+        charIdx++;
+      }
+
+      if (!skipIdx.includes(charIdx)) count++;
     }
-  }
 
-  return [...new Set(answer)].sort((a, b) => a - b);
+    return charIdx;
+  });
+
+  return sIdx.map((char) => String.fromCharCode(char)).join("");
 };

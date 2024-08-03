@@ -6,11 +6,16 @@ const solution = (s, skip, index) => {
     let count = 0;
 
     while (count !== index) {
-      charIdx++;
+      if (charIdx + 1 > 122) {
+        charIdx -= 25;
+      } else {
+        charIdx++;
+      }
+
       if (!skipIdx.includes(charIdx)) count++;
     }
 
-    return charIdx > 122 ? charIdx - 26 : charIdx;
+    return charIdx;
   });
 
   return sIdx.map((char) => String.fromCharCode(char)).join("");
