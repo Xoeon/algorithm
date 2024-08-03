@@ -3,14 +3,10 @@ const solution = (s, skip, index) => {
 
   let sIdx = [...s].map((char) => {
     let charIdx = char.charCodeAt(0);
-    let count = 0;
 
-    while (count !== index) {
-      if (charIdx + 1 > 122) {
-        charIdx -= 25;
-      } else {
-        charIdx++;
-      }
+    for (let count = 0; count < index; ) {
+      charIdx++;
+      charIdx = ((charIdx - 97) % 26) + 97;
 
       if (!skipIdx.includes(charIdx)) count++;
     }
