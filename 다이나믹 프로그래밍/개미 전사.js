@@ -7,19 +7,8 @@ const hash = [];
 hash[1] = 1;
 hash[2] = 3;
 
-const dp = (n) => {
-  if (n === 1) return hash[1];
-  if (n === 2) return hash[2];
-
-  if (!hash[n]) {
-    hash[n] = Math.max(hash[n - 2] + arr[n - 1], hash[n - 1]);
-  }
-
-  return hash[n];
-};
-
-for (let i = 1; i <= N; i++) {
-  dp(i);
+for (let i = 3; i <= N; i++) {
+  hash[i] = Math.max(hash[i - 2] + arr[i - 1], hash[i - 1]);
 }
 
 console.log(hash[N]);
