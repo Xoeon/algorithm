@@ -5,11 +5,6 @@ const keypad = [
   ['*', 0, '#'],
 ];
 
-let left = '*';
-let right = '#';
-
-const result = [];
-
 function getIndex(target) {
   for (let i = 0; i < keypad.length; i++) {
     let innerIdx = keypad[i].indexOf(target);
@@ -27,29 +22,38 @@ function getDistance(x, y) {
   return Math.abs(xIdx[0] - yIdx[0]) + Math.abs(xIdx[1] - yIdx[1]);
 }
 
-function handleRight(num) {
-  right = num;
-  result.push('R');
-}
-
-function handleLeft(num) {
-  left = num;
-  result.push('L');
-}
-
 function solution(numbers, hand) {
+  let left = '*';
+  let right = '#';
+  const result = [];
+
+  const leftSide = new Set([1, 4, 7]);
+  const rightSide = new Set([3, 6, 9]);
+
+  function handleRight(num) {
+    right = num;
+    result.push('R');
+  }
+
+  function handleLeft(num) {
+    left = num;
+    result.push('L');
+  }
+
   for (let number of numbers) {
     const leftDistance = getDistance(left, number);
     const rightDistance = getDistance(right, number);
 
-    if (number === 1 || number === 4 || number === 7) {
+    if (leftSide.has(number)) {
       handleLeft(number);
-    } else if (number === 3 || number === 6 || number === 9) {
+    } else if (rightSide.has(number)) {
       handleRight(number);
     } else {
-      if (leftDistance > rightDistance) handleRight(number);
-      else if (leftDistance < rightDistance) handleLeft(number);
-      else {
+      if (leftDistance > rightDistance) {
+        handleRight(number);
+      } else if (leftDistance < rightDistance) {
+        handleLeft(number);
+      } else {
         hand === 'left' ? handleLeft(number) : handleRight(number);
       }
     }
