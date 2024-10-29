@@ -1,40 +1,36 @@
 function solution(id_list, reports, k) {
-  const report_obj = {};
-  const report_count = {};
+  const userReports = new Map();
+  const reportCount = new Map();
 
-  for (let id of id_list) {
-    report_obj[id] = [];
-    report_count[id] = 0;
-  }
+  // 초기화: 각 사용자의 신고 목록과 신고 횟수를 저장할 맵 생성
+  id_list.forEach((id) => {
+    userReports.set(id, new Set()); // 각 사용자의 신고 목록을 Set으로 초기화하여 중복 신고 방지
+    reportCount.set(id, 0); // 각 사용자의 신고 횟수를 0으로 초기화
+  });
 
-  for (let report of reports) {
+  // 신고 처리: 중복을 제거하면서 신고자와 신고된 사람의 관계 저장
+  reports.forEach((report) => {
     const [reporter, reported] = report.split(' ');
-    report_obj[reporter].push(reported);
-  }
+    userReports.get(reporter).add(reported);
+  });
 
-  for (let reported_list of Object.values(report_obj)) {
-    const set = new Set(reported_list);
-    for (let name of set) {
-      report_count[name]++;
-    }
-  }
+  // 신고 횟수 집계
+  userReports.forEach((reportedSet) => {
+    reportedSet.forEach((reported) => {
+      reportCount.set(reported, (reportCount.get(reported) || 0) + 1);
+    });
+  });
 
-  const reported = [];
-  for (report of Object.entries(report_count)) {
-    const [name, count] = report;
-    if (count >= k) reported.push(name);
-  }
+  // 정지된 사용자 목록 생성
+  const bannedUsers = new Set(
+    [...reportCount.entries()]
+      .filter(([, count]) => count >= k)
+      .map(([name]) => name)
+  );
 
-  const ans = [];
-  for (let report_list of Object.values(report_obj)) {
-    let count = 0;
-    for (let reported_name of reported) {
-      if (report_list.find((name) => name === reported_name)) {
-        count++;
-      }
-    }
-    ans.push(count);
-  }
-
-  return ans;
+  // 각 사용자가 받은 메일 횟수 계산
+  return id_list.map((id) => {
+    const reports = userReports.get(id);
+    return [...reports].filter((user) => bannedUsers.has(user)).length;
+  });
 }
