@@ -1,29 +1,35 @@
 const input = require('fs').readFileSync('./input.txt').toString().split('\n');
 
-const M = input[0].split(' ')[1];
+const [N, M] = input[0].split(' ');
 const arr = input[1].split(' ').map((str) => +str);
 
-let start = 0;
-let end = Math.max(...arr);
+let answer = 0;
 
-let result = 0;
+const binary_search = (arr, start, end, target) => {
+  if (start > end) return;
 
-while (start <= end) {
+  const mid = Math.floor((start + end) / 2);
   let sum = 0;
-  let mid = Math.floor((start + end) / 2);
 
-  for (let x of arr) {
-    if (x > mid) {
-      sum += x - mid;
+  for (let i = 0; i < N; i++) {
+    if (arr[i] > mid) {
+      sum += arr[i] - mid;
     }
   }
 
-  if (sum < M) {
-    end = mid - 1;
+  if (sum === target) {
+    console.log('sum === target', sum, target, mid);
+    answer = mid;
+    return;
+  } else if (sum < target) {
+    console.log('sum < target', sum, target, mid);
+    return binary_search(arr, start, mid - 1, target);
   } else {
-    result = mid;
-    start = mid + 1;
+    // answer = mid;
+    console.log('sum > target', sum, target, mid);
+    return binary_search(arr, mid + 1, end, target);
   }
-}
+};
 
-console.log(result);
+binary_search(arr, 0, Math.max(...arr), +M);
+console.log(answer);
