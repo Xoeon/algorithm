@@ -1,17 +1,20 @@
 function solution(priorities, location) {
-  const arr = priorities.map((priority, idx) => [priority, idx]);
-  let order = 1;
-  let ans = [];
+  const queue = priorities.map((priority, idx) => [priority, idx]);
+  let maxPriority = Math.max(...priorities);
+  let order = 0;
 
-  while (arr.length > 0) {
-    let n = arr.shift();
+  while (queue.length > 0) {
+    const currentTask = queue.shift();
 
-    if (Math.max(n[0], ...arr.map((e) => e[0])) === n[0]) {
-      ans.push([n[1], order]);
+    if (currentTask[0] === maxPriority) {
       order++;
-      continue;
-    } else arr.push(n);
-  }
+      if (currentTask[1] === location) {
+        return order;
+      }
 
-  return ans.find((e) => e[0] === location)[1];
+      maxPriority = Math.max(...queue.map((task) => task[0]), 0);
+    } else {
+      queue.push(currentTask);
+    }
+  }
 }
