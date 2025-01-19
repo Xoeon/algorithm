@@ -25,7 +25,7 @@ class MinHeap {
     while (idx > 0) {
       let parentIdx = Math.floor((idx - 1) / 2);
 
-      if (this.compare(this.heap[parentIdx], this.heap[idx])) break;
+      if (this.compare(this.heap[parentIdx], this.heap[idx]) <= 0) break;
 
       this.swap(idx, parentIdx);
       idx = parentIdx;
@@ -53,14 +53,14 @@ class MinHeap {
 
       if (
         leftChildIdx < length &&
-        this.compare(this.heap[leftChildIdx], this.heap[smallest])
+        this.compare(this.heap[leftChildIdx], this.heap[smallest]) < 0
       ) {
         smallest = leftChildIdx;
       }
 
       if (
         rightChildIdx < length &&
-        this.compare(this.heap[rightChildIdx], this.heap[smallest])
+        this.compare(this.heap[rightChildIdx], this.heap[smallest]) < 0
       ) {
         smallest = rightChildIdx;
       }
