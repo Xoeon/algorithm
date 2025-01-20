@@ -1,90 +1,42 @@
-class MinHeap {
-  constructor() {
-    this.heap = [];
-  }
-
-  swap(aIdx, bIdx) {
-    [this.heap[aIdx], this.heap[bIdx]] = [this.heap[bIdx], this.heap[aIdx]];
-  }
-
-  compare(a, b) {
-    if (a[0] === b[0]) {
-      return a[1] - b[1];
-    }
-    return a[0] - b[0];
-  }
-
-  insert(value) {
-    this.heap.push(value);
-    this.bubbleUp();
-  }
-
-  bubbleUp() {
-    let idx = this.heap.length - 1;
-
-    while (idx > 0) {
-      let parentIdx = Math.floor((idx - 1) / 2);
-
-      if (this.compare(this.heap[parentIdx], this.heap[idx]) <= 0) break;
-
-      this.swap(idx, parentIdx);
-      idx = parentIdx;
-    }
-  }
-
-  extractMin() {
-    if (this.heap.length === 1) return this.heap.pop();
-
-    const min = this.heap[0];
-    this.heap[0] = this.heap.pop();
-    this.bubbleDown();
-
-    return min;
-  }
-
-  bubbleDown() {
-    let idx = 0;
-    let length = this.heap.length;
-
-    while (true) {
-      let leftChildIdx = 2 * idx + 1;
-      let rightChildIdx = 2 * idx + 2;
-      let smallest = idx;
-
-      if (
-        leftChildIdx < length &&
-        this.compare(this.heap[leftChildIdx], this.heap[smallest]) < 0
-      ) {
-        smallest = leftChildIdx;
-      }
-
-      if (
-        rightChildIdx < length &&
-        this.compare(this.heap[rightChildIdx], this.heap[smallest]) < 0
-      ) {
-        smallest = rightChildIdx;
-      }
-
-      if (smallest === idx) break;
-
-      this.swap(idx, smallest);
-      idx = smallest;
-    }
-  }
-
-  size() {
-    return this.heap.length;
-  }
-
-  peek() {
-    return this.heap[0];
-  }
-}
-
 function solution(jobs) {
-  const heap = new MinHeap();
+  // 각 작업에 인덱스(작업 번호) 붙이기
+  const indexedJobs = jobs.map((job, idx) => [job[0], job[1], idx]);
+  // 요청 시각 기준 정렬
+  indexedJobs.sort((a, b) => a[0] - b[0]);
 
-  jobs.forEach((job) => heap.insert(job));
+  let currentTime = 0; // 현재 시각
+  let totalTurnaround = 0; // 총 반환 시간
+  let count = 0; // 처리된 작업 수
+  let i = 0; // jobs 순회 인덱스
+  const waiting = []; // 대기 큐
 
-  console.log(heap);
+  while (count < indexedJobs.length) {
+    // 현재 시각까지 들어온 작업 대기 큐에 추가
+    while (i < indexedJobs.length && indexedJobs[i][0] <= currentTime) {
+      waiting.push(indexedJobs[i]);
+      i++;
+    }
+
+    // 대기 큐가 비어 있으면 다음 작업의 요청 시각으로 건너뜀
+    if (waiting.length === 0) {
+      currentTime = indexedJobs[i][0];
+      continue;
+    }
+
+    // 우선순위(소요시간 → 요청시각 → 작업번호)로 정렬
+    waiting.sort((a, b) => {
+      if (a[1] === b[1]) {
+        if (a[0] === b[0]) return a[2] - b[2];
+        return a[0] - b[0];
+      }
+      return a[1] - b[1];
+    });
+
+    const [start, duration] = waiting.shift();
+    currentTime += duration; // 작업 실행 후 시각 갱신
+    totalTurnaround += currentTime - start; // 반환 시간 누적
+    count++;
+  }
+
+  return Math.floor(totalTurnaround / jobs.length);
 }
