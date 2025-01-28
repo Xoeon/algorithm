@@ -1,48 +1,29 @@
-const alphabet = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-];
-
 function solution(name) {
-  const count = [];
-  name.split("").forEach((char) => {
-    const charCode = char.charCodeAt(0);
-    count.push(
-      Math.min(charCode - "A".charCodeAt(0), "Z".charCodeAt(0) - charCode + 1)
-    );
-  });
-  console.log(count);
+  const nameLength = name.length;
+  let answer = 0;
 
-  if (!count.includes(0)) {
-    return count.reduce((acc, curr) => acc + curr, 0) + count.length - 1;
-  } else {
+  // 알파벳 변경 횟수 계산
+  for (let char of name) {
+    const up = char.charCodeAt() - "A".charCodeAt();
+    const down = "Z".charCodeAt() - char.charCodeAt() + 1;
+    answer += Math.min(up, down);
   }
 
-  const reversedCount = [count[0]];
-  reversedCount.push(...count.slice(1).reverse());
-  console.log(reversedCount);
+  // 커서 이동 최소화 계산
+  let minMove = nameLength - 1;
+  for (let i = 0; i < nameLength; i++) {
+    let nextIndex = i + 1;
+
+    // 연속된 'A' 구간 탐색
+    while (nextIndex < nameLength && name[nextIndex] === "A") {
+      nextIndex++;
+    }
+
+    const move =
+      i + nameLength - nextIndex + Math.min(i, nameLength - nextIndex);
+    minMove = Math.min(minMove, move);
+  }
+
+  answer += minMove;
+  return answer;
 }
