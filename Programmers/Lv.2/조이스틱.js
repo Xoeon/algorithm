@@ -30,18 +30,19 @@ const alphabet = [
 function solution(name) {
   const count = [];
   name.split("").forEach((char) => {
+    const charCode = char.charCodeAt(0);
     count.push(
-      Math.min(
-        Math.abs(alphabet.indexOf("A") - alphabet.indexOf(char)),
-        Math.abs(alphabet.indexOf("A") - alphabet.indexOf(char) + 26)
-      )
+      Math.min(charCode - "A".charCodeAt(0), "Z".charCodeAt(0) - charCode + 1)
     );
   });
   console.log(count);
 
-  let pointer = 0;
-  while (true) {
-    if (count[pointer + 1] === 0) {
-    }
+  if (!count.includes(0)) {
+    return count.reduce((acc, curr) => acc + curr, 0) + count.length - 1;
+  } else {
   }
+
+  const reversedCount = [count[0]];
+  reversedCount.push(...count.slice(1).reverse());
+  console.log(reversedCount);
 }
