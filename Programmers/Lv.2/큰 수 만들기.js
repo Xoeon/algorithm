@@ -1,21 +1,12 @@
 function solution(number, k) {
-  let ans = "";
-  let slicedNum = number;
-
-  while (k > 0) {
-    console.log("k:", k);
-    const maxIdx = slicedNum.indexOf(Math.max(...slicedNum.slice(0, k + 1)));
-    console.log("slicedNum.slice(0, k + 1):", slicedNum.slice(0, k + 1));
-    console.log("Max Index:", maxIdx, ", Max Num:", slicedNum[maxIdx]);
-
-    ans += slicedNum[maxIdx];
-    console.log(ans);
-    slicedNum = slicedNum.slice(maxIdx + 1);
-    console.log(slicedNum);
-    k--;
-
-    console.log("------------");
+  const stack = [];
+  for (let digit of number) {
+    while (k > 0 && stack.length > 0 && stack[stack.length - 1] < digit) {
+      stack.pop();
+      k--;
+    }
+    stack.push(digit);
   }
 
-  return ans;
+  return stack.slice(0, stack.length - k).join("");
 }
