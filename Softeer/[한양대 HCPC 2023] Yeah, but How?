@@ -1,0 +1,28 @@
+const arr = require("fs").readFileSync("/dev/stdin").toString().split("");
+const stack = [];
+let eq = "";
+
+for (brace of arr) {
+  if (stack.length === 0) {
+    eq += brace;
+    stack.push(brace);
+    continue;
+  }
+
+  if (brace === "(") {
+    if (stack[stack.length - 1] === "(") {
+      eq += brace;
+    } else {
+      eq += "+" + brace;
+    }
+  } else if (brace === ")") {
+    if (stack[stack.length - 1] === "(") {
+      eq += "1" + brace;
+    } else {
+      eq += brace;
+    }
+  }
+  stack.push(brace);
+}
+
+console.log(eq);
