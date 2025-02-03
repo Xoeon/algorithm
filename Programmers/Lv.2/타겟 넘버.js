@@ -1,25 +1,17 @@
 function solution(numbers, target) {
   const n = numbers.length;
-  const combinations = [];
+  let ans = 0;
 
-  function getCombinations(index, path) {
-    if (path.length > 0) combinations.push([...path]);
-
-    for (let i = index; i < n; i++) {
-      path.push(i);
-      getCombinations(i + 1, path);
-      path.pop();
+  function dfs(x, value) {
+    if (x < n) {
+      dfs(x + 1, value + numbers[x]);
+      dfs(x + 1, value - numbers[x]);
+    } else {
+      if (value === target) ans++;
     }
   }
 
-  getCombinations(0, []);
+  dfs(0, 0);
 
-  let count = 0;
-
-  for (let arr of combinations) {
-    const sum = numbers.map((num, i) => (arr.includes(i) ? -num : num));
-    if (sum.reduce((acc, curr) => acc + curr, 0) === target) count++;
-  }
-
-  return count;
+  return ans;
 }
