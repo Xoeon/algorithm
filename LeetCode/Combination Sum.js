@@ -5,29 +5,22 @@
  */
 var combinationSum = function (candidates, target) {
   const ans = [];
-  candidates.sort((a, b) => a - b);
 
-  function dfs(arr) {
-    for (let num of candidates) {
-      if (arr[arr.length - 1] > num) continue;
+  function backtrack(start, arr, sum) {
+    if (sum === target) {
+      ans.push([...arr]);
+      return;
+    }
 
-      arr.push(num);
-      const sum = arr.reduce((acc, curr) => acc + curr, 0);
+    if (sum > target) return;
 
-      if (sum === target) {
-        ans.push([...arr]);
-        arr.pop();
-        return;
-      } else if (sum < target) {
-        dfs(arr);
-      } else {
-        arr.pop();
-        return;
-      }
+    for (let i = start; i < candidates.length; i++) {
+      arr.push(candidates[i]);
+      backtrack(i, arr, sum + candidates[i]);
       arr.pop();
     }
   }
 
-  dfs([]);
+  backtrack(0, [], 0);
   return ans;
 };
