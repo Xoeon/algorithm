@@ -3,23 +3,18 @@
  * @return {number}
  */
 var jump = function (nums) {
-  const n = nums.length;
-  let min = Infinity;
+  let jumps = 0;
+  let currentEnd = 0;
+  let farthest = 0;
 
-  function dfs(index, count) {
-    if (index > n - 1) {
-      return;
-    }
-    if (index === n - 1) {
-      min = Math.min(min, count);
-      return;
-    }
+  for (let i = 0; i < nums.length - 1; i++) {
+    farthest = Math.max(farthest, i + nums[i]);
 
-    for (let i = 1; i <= nums[index]; i++) {
-      dfs(index + i, count + 1);
+    if (i === currentEnd) {
+      jumps++;
+      currentEnd = farthest;
     }
   }
 
-  dfs(0, 0);
-  return min;
+  return jumps;
 };
