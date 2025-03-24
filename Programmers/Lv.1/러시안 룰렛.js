@@ -18,13 +18,10 @@ function solution(cylinder, a) {
 
   if (y === 0) return [0, 1];
 
-  let i = x,
-    j = y;
-  while (j !== 0) {
-    let temp = i;
-    i = j;
-    j = temp % j;
+  function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
   }
+  const g = gcd(x, y);
 
-  return [y / i, x / i];
+  return [y / g, x / g];
 }
