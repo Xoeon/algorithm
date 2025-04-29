@@ -6,27 +6,43 @@ var setZeroes = function (matrix) {
   const m = matrix.length;
   const n = matrix[0].length;
 
-  const rowSet = new Set();
-  const colSet = new Set();
+  let row0 = false,
+    col0 = false;
 
   for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
+    if (matrix[i][0] === 0) col0 = true;
+  }
+
+  for (let j = 0; j < n; j++) {
+    if (matrix[0][j] === 0) row0 = true;
+  }
+
+  for (let i = 1; i < m; i++) {
+    for (let j = 1; j < n; j++) {
       if (matrix[i][j] === 0) {
-        rowSet.add(i);
-        colSet.add(j);
+        matrix[i][0] = 0;
+        matrix[0][j] = 0;
       }
     }
   }
 
-  for (let row of rowSet) {
-    for (let j = 0; j < n; j++) {
-      matrix[row][j] = 0;
+  for (let i = 1; i < m; i++) {
+    for (let j = 1; j < n; j++) {
+      if (matrix[i][0] === 0 || matrix[0][j] === 0) {
+        matrix[i][j] = 0;
+      }
     }
   }
 
-  for (let col of colSet) {
+  if (col0) {
     for (let i = 0; i < m; i++) {
-      matrix[i][col] = 0;
+      matrix[i][0] = 0;
+    }
+  }
+
+  if (row0) {
+    for (let j = 0; j < n; j++) {
+      matrix[0][j] = 0;
     }
   }
 };
