@@ -1,54 +1,63 @@
-function solution(maps) {
+function findPos(maps, target) {
+  for (let i = 0; i < maps.length; i++) {
+    for (let j = 0; j < maps[0].length; j++) {
+      if (maps[i][j] === target) return [i, j];
+    }
+  }
+}
+
+function bfs(maps, start, target) {
   const M = maps.length;
   const N = maps[0].length;
 
-  let x = 0;
-  let y = 0;
+  const visited = Array.from({ length: M }, () => Array(N).fill(false));
+  const queue = [[...start, 0]];
 
-  for (let i = 0; i < M; i++) {
-    for (let j = 0; j < N; j++) {
-      if (maps[i][j] === "S") {
-        x = i;
-        y = j;
-        break;
+  visited[start[0]][start[1]] = true;
+
+  const dirs = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  while (queue.length) {
+    const [x, y, t] = queue.shift();
+
+    if (maps[x][y] === target) return t;
+
+    for (const [dx, dy] of dirs) {
+      const nx = x + dx;
+      const ny = y + dy;
+
+      if (
+        nx >= 0 &&
+        nx < M &&
+        ny >= 0 &&
+        ny < N &&
+        !visited[nx][ny] &&
+        maps[nx][ny] !== "X"
+      ) {
+        visited[nx][ny] = true;
+        queue.push([nx, ny, t + 1]);
       }
     }
   }
 
-  function bfs(queue, target) {
-    const dirs = [
-      [-1, 0],
-      [0, -1],
-      [1, 0],
-      [0, 1],
-    ];
+  return -1;
+}
 
-    while (queue.length > 0) {
-      const [x, y, t] = queue.shift();
+function solution(maps) {
+  const start = findPos(maps, "S");
+  const lever = findPos(maps, "L");
+  const exit = findPos(maps, "E");
 
-      if (maps[x][y] === target) {
-        return [x, y, t];
-      }
+  const toLever = bfs(maps, start, "L");
+  if (toLever === -1) return -1;
 
-      for (let [dx, dy] of dirs) {
-        const nx = x + dx;
-        const ny = y + dy;
+  const toExit = bfs(maps, lever, "E");
+  if (toExit === -1) return -1;
 
-        if (nx >= 0 && nx < M && ny >= 0 && ny < N && maps[nx][ny] !== "X") {
-          queue.push([nx, ny, t + 1]);
-        }
-      }
-    }
-
-    return -1;
-  }
-
-  const l = bfs([[x, y, 0]], "L");
-
-  if (l === -1) {
-    return -1;
-  } else {
-    const e = bfs([l], "E");
-    return e === -1 ? -1 : e[2];
-  }
+  return toLever + toExit;
 }
