@@ -1,85 +1,96 @@
 function solution(members, logs) {
-  const idx = Object.fromEntries(members.map((m, i) => [m, i]));
-  const result = Array(members.length).fill(0);
-  const setting = Object.fromEntries(
+  // 1. 기본 세팅
+  const idxMap = Object.fromEntries(members.map((m, i) => [m, i]));
+  const res = Array(members.length).fill(0);
+  const settings = Object.fromEntries(
     members.map((m) => [m, { article: true, comment: true }])
   );
 
-  const articleAuthor = {},
-    commentAuthor = {},
-    commentParent = {};
-  const subCommenters = {},
-    articleParticipants = {};
-  const commentCount = {},
-    threshold = {};
+  // 2. 상태 저장용 객체 선언
+  const articleAuthor = {};
+  const articleParticipants = {};
+  const commentCount = {};
+  const commentAuthor = {};
+  const commentParent = {};
+  const subCommenters = {};
+  const threshold = {};
 
-  for (const log of logs) {
-    const [user, type] = log;
+  // 3. 로그 순회
+  for (let log of logs) {
+    const [user, type, ...rest] = log;
 
     if (type === "ALARM") {
-      const cat = log[2].toLowerCase();
-      setting[user][cat] = !setting[user][cat];
+      const alarmType = rest[0].toLowerCase();
+      settings[user][alarmType] = !settings[user][alarmType];
     } else if (type === "ARTICLE") {
-      const aid = log[2];
-      articleAuthor[aid] = user;
-      commentCount[aid] = 0;
-      threshold[aid] = false;
-      articleParticipants[aid] = new Set();
+      const [articleId] = rest;
 
-      for (const m of members) {
-        if (m !== user && setting[m].article) {
-          result[idx[m]]++;
+      articleAuthor[articleId] = user;
+      articleParticipants[articleId] = new Set();
+      commentCount[articleId] = 0;
+      threshold[articleId] = false;
+
+      // 글 알림: article 설정이 true인 모든 회원(작성자 제외)
+      for (const member of members) {
+        if (member !== user && settings[member].article) {
+          res[idxMap[member]]++;
         }
       }
     } else if (type === "COMMENT") {
-      const cid = log[2],
-        aid = log[3];
-      articleParticipants[aid] ||= new Set();
-      const wasTh = threshold[aid];
+      const [commentId, articleId] = rest;
 
-      const rec = new Set([articleAuthor[aid], ...articleParticipants[aid]]);
-      rec.delete(user);
-      for (const r of rec) {
-        if (!setting[r]) continue;
-        if (wasTh || setting[r].comment) {
-          result[idx[r]]++;
+      // 댓글 수 갱신 & 임계치 체크
+      commentCount[articleId]++;
+      if (commentCount[articleId] >= 5) threshold[articleId] = true;
+      const bybass = threshold[articleId];
+
+      // 알림 대상 = 글 작성자 + 기존 참여자(댓글 작성자 + 대댓글 작성자)
+      const recipients = new Set([
+        articleAuthor[articleId],
+        ...articleParticipants[articleId],
+      ]);
+      recipients.delete(user);
+
+      for (const recipient of recipients) {
+        if (bybass || settings[recipient].comment) {
+          res[idxMap[recipient]]++;
         }
       }
 
-      commentAuthor[cid] = user;
-      commentParent[cid] = aid;
-      subCommenters[cid] ||= new Set();
-      articleParticipants[aid].add(user);
-
-      commentCount[aid]++;
-      if (!threshold[aid] && commentCount[aid] >= 5) {
-        threshold[aid] = true;
-      }
+      commentAuthor[commentId] = user;
+      commentParent[commentId] = articleId;
+      subCommenters[commentId] = new Set();
+      articleParticipants[articleId].add(user);
     } else if (type === "SUB_COMMENT") {
-      const scid = log[2],
-        pcid = log[3];
-      const aid = commentParent[pcid];
-      const wasTh = threshold[aid];
+      const [_, parentCommentId] = rest;
+      const articleId = commentParent[parentCommentId];
 
-      subCommenters[pcid] ||= new Set();
-      const rec = new Set([commentAuthor[pcid], ...subCommenters[pcid]]);
-      rec.delete(user);
-      for (const r of rec) {
-        if (!setting[r]) continue;
-        if (wasTh || setting[r].comment) {
-          result[idx[r]]++;
+      // 댓글, 대댓글 수 갱신 & 임계치 체크
+      commentCount[articleId]++;
+      if (commentCount[articleId] >= 5) threshold[articleId] = true;
+      const bybass = threshold[articleId];
+
+      // 알림 대상 = 댓글 작성자 + 대댓글 작성자
+      const recipients = new Set([
+        commentAuthor[parentCommentId],
+        ...subCommenters[parentCommentId],
+      ]);
+      recipients.delete(user);
+
+      for (const recipient of recipients) {
+        if (bybass || settings[recipient].comment) {
+          res[idxMap[recipient]]++;
         }
       }
 
-      subCommenters[pcid].add(user);
-      commentCount[aid]++;
-      if (!threshold[aid] && commentCount[aid] >= 5) {
-        threshold[aid] = true;
-      }
+      subCommenters[parentCommentId].add(user);
+      articleParticipants[articleId].add(user);
     }
+    console.log(res);
   }
 
-  return result;
+  // 4. 최종 리턴 (members 순서대로 배열 반환)
+  return res;
 }
 
 const members = ["A", "E", "F"];
